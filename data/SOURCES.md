@@ -1,6 +1,7 @@
 # Data sources
 
 ### Currently used
+* [OPUS](http://opus.nlpl.eu/)
 * [reddit.xml](https://www.kaggle.com/breandan/french-reddit-discussion)
 
 ### Articles
