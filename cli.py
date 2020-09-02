@@ -3,6 +3,7 @@ import click
 import pyperclip as clipboard
 
 import src.translate as translate
+import src.token as token
 
 
 @click.group()
@@ -15,7 +16,11 @@ def cli():
 @click.option('-i', '--input', default=clipboard.paste(), help='Input text to invert, if not specified: takes the clipboard\'s content.')
 def write(input):
     """Inverts the input string following Noé's rules."""
-    translation = translate.format(translate.fr_to_neo(input))
+    tokens = token.tokenize_fr(input)
+
+    print(tokens)
+
+    translation = translate.fr_to_neo(tokens)
 
     clipboard.copy(translation)
     click.secho('Aaaand the result is: ', fg='green', nl=False, bold=True)
