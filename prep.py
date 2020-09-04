@@ -16,7 +16,12 @@ if __name__ == '__main__':
         i = 0
         line = corpus.readline()
         while line:
-            line = nlp_fr(line)
+            try:
+                line = nlp_fr(line)
+            except Exception:
+                line = corpus.readline()
+                continue
+
             for sentence in line.sents:
                 line_fr = sentence.text.lower()
                 line_neo = ''.join(translate.fr_to_neo_line(line_fr))
