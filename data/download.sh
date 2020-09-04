@@ -5,12 +5,18 @@
 while getopts o: flag
 do
     case "${flag}" in
-        o) path=${OPTARG};;
+        o) output_path=${OPTARG};;
     esac
 done
 
+# Save current dir
+current_path=$(pwd)
+
 # Move into $path
-cd $path
+if [ -z ${output_path+x} ];
+    then output_path=.;
+fi
+cd $output_path
 
 # Get training data
 wget -nc https://object.pouta.csc.fi/OPUS-MultiUN/v1/moses/en-fr.txt.zip            -O multiun-en-fr.txt.zip
@@ -35,15 +41,15 @@ unzip -o ecb-en-fr.txt.zip
 unzip -o books-en-fr.txt.zip
 
 # Rename files
-mv Books-en-fr.fr           Books.fr
-mv DGT-en-fr.fr             DGT.fr
-mv ECB-en-fr.fr             ECB.fr
-mv EMEA-en-fr.fr            EMEA.fr
-mv EUbookshop-en-fr.fr      EUbookshop.fr
-mv MultiUN-en-fr.fr         MultiUN.fr
-mv OpenSubtitles-en-fr.fr   OpenSubtitles.fr
-mv TED2013-en-fr.fr         TED2013.fr
-mv Wikipedia-en-fr.fr       Wikipedia.fr
+mv Books.en-fr.fr           Books.fr
+mv DGT.en-fr.fr             DGT.fr
+mv ECB.en-fr.fr             ECB.fr
+mv EMEA.en-fr.fr            EMEA.fr
+mv EUbookshop.en-fr.fr      EUbookshop.fr
+mv MultiUN.en-fr.fr         MultiUN.fr
+mv OpenSubtitles.en-fr.fr   OpenSubtitles.fr
+mv TED2013.en-fr.fr         TED2013.fr
+mv Wikipedia.en-fr.fr       Wikipedia.fr
 
 # Keep only the .fr files
 find . -type f ! -name '*.fr' -delete
@@ -53,10 +59,21 @@ cat Books.fr DGT.fr ECB.fr EMEA.fr EUbookshop.fr MultiUN.fr OpenSubtitles.fr TED
 rm  Books.fr DGT.fr ECB.fr EMEA.fr EUbookshop.fr MultiUN.fr OpenSubtitles.fr TED2013.fr Wikipedia.fr
 
 # Shuffle
-shuf corpus-ordered.fr > corpus-full.fr
+shuf corpus-ordered.fr > corpus-shuffled.fr
+rm   corpus-ordered.fr
+
+# Prepare data (translate to neo & clean empty/long sentences)
+python3 $current_path/../prep.py $output_path
+perl $current_path/clean-corpus.perl corpus-prep fr neo corpus-clean 1 80
 
 # Make data splits
-head -n -4000 corpus-full.fr     > corpus.fr
-tail -n 4000  corpus-full.fr     > corpus-dev-test.fr
-head -n 2000  corpus-dev-test.fr > corpus-dev.fr
-tail -n 2000  corpus-dev-test.fr > corpus-test.fr
+head -n -4000 corpus-clean.fr     > corpus.fr
+head -n -4000 corpus-clean.neo    > corpus.neo
+
+tail -n 4000  corpus-full.fr      > corpus-dev-test.fr
+tail -n 4000  corpus-full.neo     > corpus-dev-test.neo
+
+head -n 2000  corpus-dev-test.fr  > corpus-dev.fr
+head -n 2000  corpus-dev-test.neo > corpus-dev.neo
+tail -n 2000  corpus-dev-test.fr  > corpus-test.fr
+tail -n 2000  corpus-dev-test.neo > corpus-test.neo

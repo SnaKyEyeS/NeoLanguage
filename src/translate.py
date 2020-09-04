@@ -1,14 +1,21 @@
+import re
+import spacy
 import itertools
 
+from websocket import create_connection
 
-def fr_to_neo(tokens):
+nlp_fr = spacy.load('fr_core_news_sm')
+
+
+def fr_to_neo(text):
     """
     Translates from French to Neo-Language.
     """
     result = list()
+    text = nlp_fr(text)
 
-    for sentence in tokens:
-        result.append(fr_to_neo_line(sentence))
+    for sentence in text.sents:
+        result.append(fr_to_neo_line(sentence.text.lower()))
 
     return format(result)
 
@@ -19,7 +26,7 @@ def fr_to_neo_line(sentence):
     """
     tokens = list()
 
-    for token in sentence:
+    for token in re.split('(\\W)', sentence):
         if token.isalpha():
             token = token[1:][::-1]                 # Remove first letter (1) and reverse (2)
             token = token.replace('i', 'ii')        # Double the i's (3)
@@ -30,6 +37,15 @@ def fr_to_neo_line(sentence):
             tokens.append(token)
 
     return tokens
+
+
+def neo_to_fr(text):
+    """
+    Translates a Neo text to French.
+    """
+    ws = create_connection("ws://localhost:{}/translate".format(8080))
+    ws.send(text)
+    return ws.recv()
 
 
 def format(output):

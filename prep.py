@@ -1,22 +1,31 @@
-import src.token as token
+import sys
+import spacy
+
 import src.translate as translate
 
+nlp_fr = spacy.load('fr_core_news_sm')
+base_path = '/media/jyl/MEMJYL/data2/'
 
-base_path = '/media/jyl/MEMJYL/data/'
 
-i = 0
-with open(base_path + 'corpus-full.fr', 'r') as corpus, open(base_path + 'corpus-prepped.fr', 'w') as fr, open(base_path + 'corpus-prepped.neo', 'w') as neo:
-    line = corpus.readline()
+if __name__ == '__main__':
+    path = sys.argv[1]
+    corpus_shuffled = f'{path}/corpus-shuffled.fr'
+    corpus_prep_fr = f'{path}/corpus-prep.fr'
+    corpus_prep_neo = f'{path}/corpus-prep.neo'
 
-    while line:
-        tokens = token.tokenize_fr(line)
-        for sentence in tokens:
-            line_neo = ''.join(translate.fr_to_neo_line(sentence))
-            line_fr = ''.join(sentence)
-
-            neo.write(line_neo)
-            fr.write(line_fr)
-
+    with open(corpus_shuffled, 'r') as corpus, open(corpus_prep_fr, 'w') as fr, open(corpus_prep_neo, 'w') as neo:
+        i = 0
         line = corpus.readline()
+        while line:
+            line = nlp_fr(line)
+            for sentence in line.sents:
+                line_fr = sentence.text.lower()
+                line_neo = ''.join(translate.fr_to_neo_line(line_fr))
 
-print('Done !')
+                fr.write(line_fr)
+                neo.write(line_neo)
+
+            i += 1
+            if i % 1e5 == 0:
+                print(f'Currently at line n°{i}...')
+            line = corpus.readline()
