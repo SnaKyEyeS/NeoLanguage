@@ -4,7 +4,6 @@ import spacy
 import src.translate as translate
 
 nlp_fr = spacy.load('fr_core_news_sm')
-base_path = '/media/jyl/MEMJYL/data2/'
 
 
 if __name__ == '__main__':
@@ -25,7 +24,7 @@ if __name__ == '__main__':
                 fr.write(line_fr)
                 neo.write(line_neo)
 
-            i += 1
             if i % 1e5 == 0:
                 print(f'Currently at line n°{i}...')
+            i += 1
             line = corpus.readline()
