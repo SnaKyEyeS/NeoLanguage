@@ -70,8 +70,8 @@ perl $current_path/clean-corpus.perl corpus-prep fr neo corpus-clean 1 80
 head -n -4000 corpus-clean.fr     > corpus.fr
 head -n -4000 corpus-clean.neo    > corpus.neo
 
-tail -n 4000  corpus-full.fr      > corpus-dev-test.fr
-tail -n 4000  corpus-full.neo     > corpus-dev-test.neo
+tail -n 4000  corpus-clean.fr     > corpus-dev-test.fr
+tail -n 4000  corpus-clean.neo    > corpus-dev-test.neo
 
 head -n 2000  corpus-dev-test.fr  > corpus-dev.fr
 head -n 2000  corpus-dev-test.neo > corpus-dev.neo
