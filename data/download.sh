@@ -63,7 +63,7 @@ shuf corpus-ordered.fr > corpus-shuffled.fr
 rm   corpus-ordered.fr
 
 # Prepare data (translate to neo & clean empty/long sentences)
-python3 $current_path/../prep.py $output_path
+$current_path/../venv/bin/python $current_path/../prep.py $output_path
 perl $current_path/clean-corpus.perl corpus-prep fr neo corpus-clean 1 80
 
 # Make data splits
